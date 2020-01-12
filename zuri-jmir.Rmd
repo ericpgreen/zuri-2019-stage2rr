@@ -1,0 +1,1027 @@
+---
+title             : "Expanding Access to Depression Treatment in Kenya Through Automated Psychological Support: Stage 2 Registered Report"
+shorttitle        : "Automated Psychological Support"
+
+author: 
+  - name          : "Eric P. Green"
+    affiliation   : "1"
+    corresponding : yes    # Define only one corresponding author
+    address       : "Duke Global Health Institute, Box 90519, Durham, NC, USA"
+    email         : "eric.green@duke.edu"
+  - name          : "Nicholas Pearson"
+    affiliation   : "1,2"
+  - name          : "Sathy Rajasekharan"
+    affiliation   : "2"
+  - name          : "Michiel Rauws"
+    affiliation   : "3"
+  - name          : "Angie Joerin"
+    affiliation   : "3"
+  - name          : "Edith Kwobah"
+    affiliation   : "4"
+  - name          : "Christine Musyimi"
+    affiliation   : "5"
+  - name          : "Rachel Jones"
+    affiliation   : "2"
+  - name          : "Chaya Bhat"
+    affiliation   : "1"
+  - name          : "Yihuan Lai"
+    affiliation   : "1"
+  - name          : "Antonia Mulinge"
+    affiliation   : "2"
+  - name          : "Eve S. Puffer"
+    affiliation   : "1,6"
+
+affiliation:
+  - id            : "1"
+    institution   : "Duke Global Health Institute"
+  - id            : "2"
+    institution   : "Jacaranda Health"
+  - id            : "3"
+    institution   : "X2AI"
+  - id            : "4"
+    institution   : "Moi Teaching and Referral Hospital"
+  - id            : "5"
+    institution   : "Africa Mental Health Foundation"
+  - id            : "6"
+    institution   : "Department of Psychology and Neuroscience, Duke University "
+
+authornote: |
+  MR is the CEO and Founder of X2AI and created Tess. AJ is an employee of X2AI. EPG is an unpaid advisor to the X2AI Ethical Advisory Board and has no financial stake in the company.
+
+abstract: |
+  Background. Depression during pregnancy and in the postpartum period is associated with a number of poor outcomes for women and their children. Although effective interventions exist for common mental disorders that occur during pregnancy and the postpartum period, most cases in low- and middle-income countries go untreated because of a lack of trained professionals. Task-sharing models such as the *Thinking Healthy* Program have shown great potential in feasibility and efficacy trials as a strategy for expanding access to treatment in low-resource settings, but there are significant barriers to scale-up. We are addressing this gap by adapting *Thinking Healthy* for automated delivery via a mobile phone. This new intervention, *Healthy Moms*, uses an existing artificial intelligence system called Tess (Zuri in Kenya) to drive conversations with users.
+
+  Objective. The primary objective of this pre-pilot study was to gather preliminary data on the *Healthy Moms* perinatal depression intervention to learn how to build and test a more robust service. We did this through a single-case experimental design with pregnant women and new mothers recruited from public hospitals outside of Nairobi, Kenya.
+
+  Methods. We invited women to complete a brief, automated screening delivered via text messages to determine their eligibility. Enrolled participants were randomized to a 1- or 2-week baseline period and then invited to begin using Zuri. We prompted participants to rate their mood via short message service every 3 days during the baseline and intervention periods, and we used this preliminary repeated measures data to fit a linear mixed-effects model of response to treatment. We also reviewed system logs and conducted in-depth interviews with participants to study engagement with the intervention, feasibility, and acceptability. IRRID: DERR1-10.2196/11800.
+
+  Results. We invited 647 women to learn more about Zuri. Of those invited, 86 completed our automated SMS screening, and 41 enrolled in the study. Most of the enrolled women submitted at least 3 mood ratings (75.6%) and sent at least 1 message to Zuri (65.9%). A third of women in the sample engaged beyond registration (34.1%). The average woman who engaged with Zuri post-registration started and completed 3.4 (SD=3.2) and 3.1 (SD=2.9) *Healthy Moms* sessions, respectively. Most interviewees who had tried Zuri had a very positive attitude towards the service and expressed that they could trust Zuri. They also attributed positive life changes to the intervention. We estimated that using this alpha version of Zuri led to a 7% increase in mood.
+
+  Conclusions. Zuri is feasible to deliver via SMS and was acceptable to this sample of pregnant women and new mothers. The results of this pre-pilot will serve as a baseline for future studies in terms of recruitment, data collection, and outcomes. The next step in Zuri's development is to refine the intervention content and add Swahili language support. Conversational agents like Zuri have great potential to address the large treatment gap that exists in many low-resource settings, both as a new channel of treatment and as an adjunct to traditional and task-shifting approaches.
+  
+keywords          : "telemedicine; mental health; depression; artificial intelligence; Kenya; text messaging; chatbot; conversational agent"
+
+bibliography      : ["r-references.bib","hm.bib"]
+
+floatsintext      : no
+figurelist        : no
+tablelist         : no
+footnotelist      : no
+linenumbers       : yes
+mask              : no
+draft             : no
+
+documentclass     : "apa6"
+classoption       : "man"
+csl               : journal-of-medical-internet-research.csl
+output            : papaja::apa6_pdf
+header-includes:
+  - \usepackage{setspace}
+  - \AtBeginEnvironment{tabular}{\singlespacing}
+  - \usepackage{pdflscape}
+  - \newcommand{\blandscape}{\begin{landscape}}
+  - \newcommand{\elandscape}{\end{landscape}}
+  - \raggedbottom
+---
+
+```{r setup, include = FALSE}
+  library(papaja)
+  library(furniture)
+  library(knitr)
+  library(kableExtra)
+  library(tidyverse)
+  library(gridExtra)
+  library(tidyquant)
+  library(nlme)
+  library(glmmTMB)
+  library(stargazer)
+  library(ggthemes)
+  library(brms)
+  library(bayesplot)
+  library(arm)
+  library(ggalt)
+```
+
+```{r document-preferences}
+  knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+
+# define colors
+  hm_colors <- c(
+    `teal`       = "#81cbce",
+    `salmon`     = "#ee7067",
+    `green`      = "#468486",
+    `orange`     = "#e1752d",
+    `red`        = "#b62943",
+    `black`      = "#000000",
+    `lightgrey`  = "#D3D3D3",
+    `darkgrey`   = "#A9A9A9",
+    `grey`       = "#808080"
+  )
+```
+
+# Introduction
+
+Depression is a leading cause of disability worldwide. Women suffering from perinatal depression are a particularly underserved population. Depression during pregnancy and in the postpartum period (perinatal depression) affects as many as 20% of women in high-income countries [@gavin:2005] and maybe more in low-income countries [@villegas:2011]. The condition is associated with a number of poor outcomes for women and their children, including increased maternal morbidity and mortality [@khalifeh:2016; @Oates:2003a], poor infant health [@field:2010; @gelaye:2016; @grigoriadis:2013; @rahman:2016; @surkan:2016], and poor developmental outcomes [@beck:1998; @gentile:2017; @junge:2017].
+
+Although effective interventions exist for common mental disorders that occur during pregnancy and the postpartum period [@oconnor:2019], most cases in low- and middle-income countries (LMICs) go untreated. In these settings, more than 7 out of 10 people who need treatment cannot access care because of a lack of trained professionals [@lund:2012]. In Kenya, for example, there are only 180 psychiatric nurses outside of the capital city, a ratio of 1 provider per 200,000 people. To close this gap, the World Health Organization developed the Mental Health Gap Action Programme intervention guide outlining how to deliver mental health services in primary health care settings through nonspecialist providers. This task-sharing approach has proven efficacious, particularly for maternal mental health [@baron:2016].
+
+A prime example is the 15-session *Thinking Healthy Program*, a cognitive behavior therapy (CBT)–based intervention for treating perinatal depression that is intentionally nonstigmatizing [@worldhealthorganization:2015]. Community health workers—typically women educated through secondary school with no specific background in mental health—are trained over 5 to 10 days to help pregnant women learn three skills: (1) to identify unhealthy thinking, (2) to replace unhealthy thinking with helpful thinking, and (3) to practice thinking and acting healthy. In a trial in Pakistan with 900 pregnant women, Rahman et al found that the intervention halved the prevalence of major depression [@rahman:2008], and a 7-year follow-up study reported some spontaneous recovery among the control group but also a persistent effect of treatment [@baranov:2020]. A peer-delivered version of *Thinking Healthy* offers a potential cost-effective first-line strategy for treating perinatal depression [@fuhr:2019]
+
+Despite this impressive evidence of feasibility and efficacy, however, there are significant barriers to scale-up [@rahman:2007], and there is evidence that intervention effects might not extend to children of depressed mothers without additional engagement [@maselko:2015a]. Common implementation challenges of task-sharing models such as *Thinking Healthy* include a lack of funding and infrastructure for training and service delivery, workforce retention in the absence of compensation or incentives for nonspecialists, high workloads, transportation costs, appointment scheduling logistics, and inadequate clinical supervision [@padmanathan:2013]. Although it is critical to study how to optimize and scale these task-sharing approaches, the fact remains that, today, most women in LMICs who need treatment still have no access to care.
+
+Given this demand and barriers to scale-up, our intention is to make it possible for anyone with a basic phone to receive high-quality, evidence-based psychological support anytime, anywhere. We are attempting this in the context of perinatal depression by adapting *Thinking Healthy* to an existing artificial intelligence (AI) system for automated psychological support called Tess (which we have named *Zuri* in Kenya). This idea is innovative because it introduces an entirely new delivery channel that has the potential for a step change in expanding access to care, while also potentially augmenting and strengthening existing task-sharing models.
+
+Zuri works by engaging a patient in conversation via a variety of trusted channels, including text messaging (short message service, or SMS). Either Zuri or the patient can start a conversation, and Zuri can be programmed to walk a patient through a structured curriculum such as *Thinking Healthy*. As a safety measure, conversations with patients in need of additional support can be handed over to live counselors as needed. Potential benefits of this approach include on-demand 24/7 access for an unlimited number of patients, no scheduling of appointments, no travel costs to appointments, enhanced sense of privacy and avoidance of social stigma, and high fidelity to treatment.
+
+## Study Objectives
+
+Our long-term goal is to expand access to high-quality, on-demand treatment services to people who suffer from common mental disorders such as perinatal depression but cannot receive care from mental health professionals because of cost and human resource constraints. The main objectives of this study were to adapt *Thinking Healthy* for dissemination in Kenya through the Zuri AI system; develop and test study procedures to inform the design of a randomized controlled trial; and generate preliminary evidence of feasibility, acceptability, and response to treatment.
+
+# Methods
+
+## Research Design
+
+We adapted *Thinking Healthy* for the Zuri AI system and evaluated the combined perinatal depression intervention (which we are calling *Healthy Moms*) with a cohort of pregnant women and new mothers recruited from two large public hospitals in Kenya. We used a single-case experimental design (partially nonconcurrent multiple baseline [@watson:1981], open label) and qualitative interviews to generate preliminary data on feasibility, acceptability, and response to treatment. This is a Stage 2 Registered Report. The Stage 1 protocol (DERR1-10.2196/11800) describes our preliminary work to adapt *Thinking Healthy* for dissemination in Kenya through the Zuri AI system [@green:2019a].
+
+## Participants and Recruitment
+
+We recruited pregnant women and new mothers from two large public hospitals in Kiambu County, Kenya. Both hospitals are part of a county-wide partnership offering patients innovative SMS programs that promote healthy motherhood [@sheppard:2018]. When a woman signed up for the county SMS service, we sent her an invitation via SMS to complete an automated SMS screening (in English) to determine if she was eligible for *Healthy Moms*. The screening included questions about age, maternity status, expected or actual delivery date, 9 questions about symptoms of depression from the Patient Health Questionnaire-9 (PHQ-9) [@kroenke:2001], and a question about her current mood.
+
+We informed all women who completed the automated screening that a study team member would call them within 1 business day. During this follow-up call, women who endorsed having thoughts of self-harm in the past 2 weeks (Question 9 on the PHQ-9) were offered a referral for counseling but were not eligible to enroll in *Healthy Moms* given the early stage of intervention development. All other women were eligible to enroll as long as they confirmed that they were at least 20 weeks pregnant or no more than 6 months postpartum. The study coordinator (AM)—a Kenyan woman fluent in English and Swahili—assessed each woman's English-speaking ability on the call and asked women to rate their ability to read and understand English. Women could enroll regardless of language ability, but we informed low English literacy women that they might not find value in the current version of the program if they were not comfortable reading and writing in English.
+
+If a woman chose to continue the enrollment process, the study coordinator read the informed consent form, answered her questions, and obtained verbal informed consent to enroll. She asked enrollees to share information about the type of phone they use, schooling, number of dependents, marital status, and employment status.
+
+## Eligibility
+
+To be eligible to participate, women needed to meet the following criteria: (1) pregnant (>20 weeks) or less than 6 months postpartum; (2) receiving antenatal or postnatal health care services from a participating hospital in Kiambu County; (3) enrolled in the county SMS program; and (4) at least 18 years of age. English language proficiency and self-reported experience of depression symptoms were not required but were assessed. Women who endorsed suicidal ideation at the time of recruitment were ineligible to enroll in the study and were informed about potential resources for treatment.
+
+## Randomization to Baseline Length
+
+As each woman enrolled in the study, we attempted to match her to another new enrollee of similar maternity status and randomly assigned the pair to have a 1-week or 2-week baseline period (using a random number generator). The intention was to ensure that every participant had a concurrent baseline period with at least one other person.
+
+## Intervention
+
+We invited women to participate in phone sessions of the *Healthy Moms* intervention based on their maternity status at enrollment. We modeled these automated SMS sessions after the original *Thinking Healthy* manual that was developed to guide community health workers to deliver the intervention in-person over 15 sessions [@worldhealthorganization:2015]. We also created a companion *Healthy Moms* journal that we printed and delivered to enrolled participants [@green:2019]. The journal included modified health calendars from the original *Thinking Healthy* intervention along with short session summaries and writing prompts. This pilot study was an opportunity to get feedback on the journal to inform how we might adapt the content into text, audio, and video for electronic delivery (and ultimately discontinue print versions in future trials). We conducted an initial round of user testing to develop the SMS intervention journal content [@green:2018].
+
+During each *Healthy Moms* session, women interacted with the automated system via SMS. Late in the study we also enabled women to chat with Zuri via Facebook Messenger. In between sessions, women were encouraged to start a conversation with Zuri by sending a free message. Zuri attempted to discern the user's request and responded automatically with answers or replies that employed active listening techniques such as restatement and reflection. If a woman discussed self-harm or other crisis topics, Zuri had the ability to alert a live study support member who could take over the chat session or call the participant directly and facilitate a referral to traditional in-person treatment if indicated (Zuri was programmed to inform women that her response might not be immediate at this stage of testing, so they should seek help at an emergency room if in a crisis). During enrollment we also informed participants that they were free to seek concomitant care and interventions at any point during the study.
+
+Just as mental health specialists and nonspecialists trained to deliver psychotherapy improve over time with practice and experience, AI-enhanced systems such as Zuri also change, albeit in more subtle ways, given the current state of the technology. For instance, Zuri's emotion recognition algorithms updated automatically when it correctly or incorrectly interpreted the emotional valence of a user's input, but the didactic intervention content did not change dynamically. Modifications to the intervention content were made manually; we reviewed conversation transcripts and made minor changes to the wording or sequence of messages when we noticed that users were confused or not engaging.
+
+## Outcomes and Data Collection Procedures
+
+We collected data on study implementation, intervention engagement, feasibility and acceptability of the intervention, and patient outcomes, including depression severity and current mood.
+
+### Study Implementation
+
+We tracked data on the recruitment funnel from the initial screening invite through the secondary eligibility screening to ultimate engagement with the intervention. We also tracked participants' responses to regular prompts to complete automated assessments throughout the study period.
+
+### Intervention Engagement
+
+We assessed intervention engagement by reviewing Zuri system logs to document completion of *Healthy Moms* sessions and patient-initiated engagement with Zuri outside of scheduled sessions. The Zuri system logs also informed our assessment of feasibility and acceptability; low engagement was considered a marker of potential barriers to feasibility or a lack of acceptability. 
+
+### Feasibility and Acceptability of the Intervention
+
+We further explored feasibility and acceptability by inviting 15 enrolled women to participate in individual interviews during the evaluation period. We purposively invited 3 different types of participants: those who did not finish the registration process with Zuri (5), those who finished the registration process but did not complete a session (5), and those who completed at least one session (5). A Master's-level trainee (YL) and the study coordinator (AM, Kenyan) conducted the interviews. Women who did not complete a full session with Zuri were interviewed by telephone. Women who completed one or more sessions were reimbursed to travel to one of the study hospitals for an in-person interview. The interviews lasted approximately 20 to 40 minutes and followed a semi-structured interview guide. The guide included open-ended questions and follow-up probes related to reasons for using Zuri, attitudes towards Zuri, favorite features, preferences of language and platform, challenges encountered, and perceived impacts after using Zuri. The interviews were conducted in English, but the study coordinator provided simultaneous translation to Swahili as needed.
+
+In addition to these interviews, we also attempted to document all contact the research team had with participants outside of the Zuri AI system and logged all adverse events. We were interested in determining how much assistance or encouragement users need from the team to understand and use the automated intervention.
+
+### Patient Outcomes
+
+To measure mood, we asked participants to rate their feelings on a 10-point scale that we created and tested with users [@green:2019a], where 1 meant very sad and 10 meant very happy (shifted to 0-9 for analysis). We invited women to rate their current mood via SMS during the enrollment screening and then every 3 days throughout the baseline and intervention periods. Each rating invitation reminded women of their previous rating. We also encouraged women to track and reflect on their mood and behaviors on a daily basis using the *Healthy Moms* journal we provided as part of the intervention (not analyzed) [@green:2019].
+
+We also administered the PHQ-9 [@kroenke:2001] via SMS. Our intention was to assess depression severity throughout the intervention period, but after developing the protocol we determined that the depression screening was too long to administer on a repeating basis. Instead we opted to collect our minimum target of two self-ratings of depression severity representing pre- and post-treatment. 
+
+## Empirical Approach
+
+### Describe Study Implementation and Intervention Engagement
+
+We used the study database to summarize the recruitment funnel and outcome data collection progress. We quantified intervention engagement in several ways. First, we used the system logs to summarize how frequently each participant engaged with the intervention by either participating in a *Healthy Moms* session (in response to a scheduled invite) or initiating a chat with Zuri in between scheduled sessions. We also calculated and summarized the delay between our invitations to begin a *Healthy Moms* session and participants' start times, the proportion of *Healthy Moms* sessions started and completed, and the duration of participant-initiated chats with Zuri.
+
+### Explore Intervention Feasibility and Acceptability
+
+As a hypothesis-generating exercise, we estimated the magnitude and direction of associations between participant characteristics measured at baseline (e.g., age, education, literacy, and symptom severity) and intervention engagement by fitting a Bayesian linear regression model. 
+
+We also explored barriers to and facilitators of engagement during in-depth interviews with participants and reviews of chat transcripts. Throughout the process, the interviewer/analyst (YL) wrote memos to capture the main themes. In preparation for the thematic analysis, she developed a codebook and randomly selected one transcript that was double-coded and discussed. After refining the codebook, the analyst used NVivo 12 to code memos and transcripts. The analyst wrote analytic memos for each thematic code, identifying similarities and differences across transcripts using a constant comparative method [@glaser:1965]. She identified representative quotations of each theme.
+
+### Generate Preliminary Evidence About Participant Response to Treatment
+
+We aggregated the individual N-of-1 studies and estimated the magnitude of response and quantified uncertainty by fitting Bayesian linear mixed-effects models [@rindskopf:2014,@shahar:2017,@moeyaert:2017] in R (version 3.5) using the `brms` package [version 2.10; @brms] with default priors. As described in the protocol, the first model we fit included a random effect for observations nested within participants and the following fixed effects: (1) an intercept; (2) a dummy indicator for the treatment phase; (3) a time-within-baseline variable centered around the first observation (equal to 0 for observations outside of the baseline period); and (4) a time-within-treatment variable centered around the last observation (equal to 0 for observations outside of the treatment period). We applied a first-order autoregressive structure on the covariance matrix for the within-person residuals to account for autocorrelation. 
+
+We also fit a similar model not described in the protocol that reflected a lesson we learned in another project: rather than centering the time-within-period variables around a single observation, it may be more reasonable to center around the average of several consecutive observations when there is substantial individual variability in daily ratings. In this model, we centered the time-within-baseline variable around the *first 3* observations and centered the time-within-treatment variable around the *last 3* observations. This 3-observation centering window was practical given data availability; we did not run the model with different window sizes to avoid cherry-picking the results. In the end, our choice of centering had no impact on the results, so we decided to focus on the 3-observation centering window as an example of what we would likely attempt in a future trial using this design.
+
+We augmented this quantitative analysis with a qualitative analysis of in-depth interviews. We explored what links, if any, participants could make between engagement with the intervention and their mood, health, and relationships. We intended to also explore themes among women who did not exhibit positive changes in mood ("non-responders") but this was not feasible given delays in launching the study. 
+
+## Research Ethics
+
+We obtained approvals to conduct this study from the Institutional Review Boards at Duke University (US, 2018-0396) and Strathmore University (Kenya, SU-IRB 0210/18) as well as from the National Commission for Science and Technology in Kenya.
+
+A trained study coordinator, AM (female, Kenyan), explained the study to prospective participants via telephone and administered informed consent procedures. All eligible participants had to provide oral informed consent to enroll.
+
+Study participants were provided with an honorarium of up to Ksh 1500 (roughly US $15) delivered via mobile money transfer to recognize time spent completing study assessments. The original plan was to make these transfers after women completed sessions 1, 5, and 10, but in practice we sent women prorated honoraria on the basis of lower benchmarks of engagement given delays in launching the study.
+
+X2AI, the creators of the AI system that we used to deliver *Healthy Moms*, transferred data to the research team in accordance with X2AI's data security policies [@x2ai]. The first author (EG) stored identifiable study data on Duke's Box.com servers during the study and then deidentified the data for analysis using the Safe Harbor method. Anonymized quantitative data and the code used to generate this manuscript is available for re-analysis.
+
+## Summary of Deviations from Stage 1 Protocol
+
+In addition to changing the tense of the writing from future to past, we also made several edits to the *Introduction* and modified several procedures described in the *Methods* of the Stage 1 protocol [@green:2019a]: (1) labeled the study as a "pre-pilot" rather than "pilot" to better reflect that the data are preliminary and intended to inform the design of a larger pilot study; (2) moved text from the "Scientific Objectives and Significance" and "Expected Outcomes" subsections to the *Discussion* (but did not alter the objectives); (3) expanded access to the intervention from just SMS to include Facebook Messenger; (4) visualized the daily mood ratings but relied on model fitting rather than visual inspection to estimate trends and period impacts; and (5) dropped a planned "non-responder" qualitative inquiry and modified the honorarium schedule due to limited time.
+
+# Results
+
+```{r}
+# load data
+  invite <- read.csv("input/invite.csv",
+                     stringsAsFactors = FALSE)
+  adminEnroll <- read.csv("input/adminEnroll.csv",
+                          stringsAsFactors = FALSE)
+  adminScreen <- read.csv("input/adminScreen.csv",
+                          stringsAsFactors = FALSE)
+  screenSMS <- read.csv("input/screenSMS.csv", 
+                        stringsAsFactors = FALSE)
+  mood <- read.csv("input/mood.csv",
+                   stringsAsFactors = FALSE)
+  screenPre <- read.csv("input/screenPre.csv",
+                        stringsAsFactors = FALSE)
+  screenPost <- read.csv("input/screenPost.csv",
+                         stringsAsFactors = FALSE)
+  transcripts <- read.csv("input/transcripts.csv",
+                          stringsAsFactors = FALSE)
+  convo_duration <- read.csv("input/convo_duration.csv",
+                          stringsAsFactors = FALSE)
+  inviteToStart <- read.csv("input/inviteToStart.csv",
+                            stringsAsFactors = FALSE)
+  modules <- read.csv("input/modules.csv",
+                      stringsAsFactors = FALSE)
+```
+
+```{r screening}
+# construction
+  screenPre <- 
+  screenPre %>% 
+    mutate_at(vars(starts_with("b_phq")), list(~recode(.,
+                                                       `Never` = 0,
+                                                       `A little` = 1,
+                                                       `A lot` = 2,
+                                                       `A very lot` = 3))) %>%
+    mutate(b_phqTotal = rowSums(dplyr::select(., starts_with("b_phq")))) %>%
+    mutate(b_phqPossDep = ifelse(b_phqTotal>=15, "yes", "no")) %>%
+    mutate(b_phqPossDep = factor(b_phqPossDep, 
+                                 levels=c("no", "yes"),
+                                 labels = c("No", "Yes"))
+           ) %>%
+    mutate(b_engReadSelfRate = factor(b_engReadSelfRate, 
+                                      levels=c("poor", "just ok", 
+                                               "good", "excellent"),
+                                      labels=c("Poor", "Just OK",
+                                               "Good", "Excellent")),
+           b_engSpeakRate = factor(b_engSpeakRate, 
+                                   levels=c("poor", "just ok", 
+                                            "good", "excellent"),
+                                   labels=c("Poor", "Just OK",
+                                               "Good", "Excellent")),
+           b_phoneType = factor(b_phoneType, 
+                                levels=c("regular phone", "smartphone"),
+                                labels=c("Regular phone", "Smartphone")),
+           b_highedEduAttended = factor(b_highedEduAttended, 
+                                        levels=c("None",
+                                                 "Primary",
+                                                 "Post-Primary/Vocational", 
+                                                 "Secondary", 
+                                                 "College", 
+                                                 "University")),
+           b_marital = factor(b_marital, 
+                              levels = c("No, not in a union", 
+                                         "Yes, currently married but living apart",
+                                         "Yes, living with someone as if married",
+                                         "Yes, currently married and living together")),
+           b_ssMaternity = factor(b_ssMaternity, 
+                                  levels=c("pregnant", "postpartum"),
+                                  labels=c("Pregnant", "Postpartum")),
+           b_workOutsideHome = factor(b_workOutsideHome, 
+                                      levels=c("yes", "no"),
+                                      labels=c("Yes", "No")),
+           b_mood = as.numeric(b_mood)
+           )
+  
+  screenPost <- 
+  screenPost %>% 
+    mutate_at(vars(starts_with("t_phq")), list(~recode(.,
+                                                       `Never` = 0,
+                                                       `A little` = 1,
+                                                       `A lot` = 2,
+                                                       `A very lot` = 3))) %>%
+    mutate(t_phqTotal = rowSums(dplyr::select(., starts_with("t_phq")))) %>%
+    mutate(t_phqPossDep = ifelse(t_phqTotal>=15, "yes", "no")) %>%
+    mutate(t_phqPossDep = factor(t_phqPossDep, 
+                                 levels=c("no", "yes"),
+                                 labels = c("No", "Yes"))
+           )
+  
+  screenSMS <- 
+  screenSMS %>% 
+    mutate_at(vars(starts_with("phq")), list(~recode(.,
+                                                     `Never` = 0,
+                                                     `A little` = 1,
+                                                     `A lot` = 2,
+                                                     `A very lot` = 3))) %>%
+    mutate(phqTotal = rowSums(dplyr::select(., starts_with("phq")))) %>%
+    mutate(phqPossDep = ifelse(phqTotal>=15, "yes", "no")) %>%
+    mutate(phqPossDep = factor(phqPossDep, 
+                               levels=c("no", "yes"),
+                               labels = c("No", "Yes"))
+           ) %>%
+    filter(!is.na(phqTotal))
+```
+
+## Study Implementation
+
+### Recruitment and Participants
+
+```{r}
+# invited
+  pregnantP <- mean(invite$anc)*100
+
+# all screened
+  screenPossDep <- 
+  screenSMS %>% 
+    group_by(phqPossDep) %>% 
+    count() %>% 
+    ungroup() %>% 
+    mutate(p = (n/sum(n))*100) %>%
+    filter(phqPossDep=="Yes") %>%
+    pull(p)
+  
+  phq9M_allscreened <- mean(screenSMS$phqTotal)
+  phq9SD_allscreened <- sd(screenSMS$phqTotal)
+
+# eligible
+  eligibleN <- 
+  adminScreen %>% 
+    filter(followupResult=="enrolled" | followupResult=="did not enroll") %>%
+    count() %>%
+    pull(n)
+  
+# enrolled
+  ageM <- mean(screenPre$b_age, na.rm=TRUE)
+  
+  kidsM <- mean(screenPre$b_depChildren, na.rm=TRUE)
+  
+  pregnantP_enrolled <- 
+    screenPre %>%
+    filter(b_ssMaternity=="Pregnant") %>%
+    count() %>% 
+    mutate(p = (n/nrow(screenPre))*100) %>%
+    pull(p)
+  
+  phq9M <- mean(screenPre$b_phqTotal)
+  phq9SD <- sd(screenPre$b_phqTotal)
+  stepM <- mean(screenPre$b_mood)
+  stepSD <- sd(screenPre$b_mood)
+```
+
+We invited `r nrow(invite)` women (`r printnum(pregnantP, digits=0)`% pregnant, `r printnum(100-pregnantP, digits=0)`% new mothers) already enrolled in their county's SMS program to learn more about Zuri, and `r nrow(adminScreen)` (`r printnum((nrow(adminScreen)/nrow(invite))*100, digits=0)`%) completed our automated SMS screening between February 12, 2019 and June 18, 2019 (`r printnum(screenPossDep, digits=0)`% of women scored at or above the cutoff for possible depression, M=`r printnum(phq9M_allscreened, digits=1)`, SD=`r printnum(phq9SD_allscreened, digits=1)`). We determined that `r eligibleN` of these `r nrow(adminScreen)` women were eligible to participate, and `r nrow(adminEnroll)` completed the enrollment process (see Figure \@ref(fig:flow)).
+
+```{r flow, fig.cap="Study flow diagram."}
+  knitr::include_graphics("Zuri flow diagram.pdf")
+```
+
+Table \@ref(tab:characteristics) reports the characteristics of enrolled participants. The sample was evenly divided between pregnant women and new mothers. The average woman who enrolled in the study was `r printnum(ageM, digits=1)` years old. All women reported that they could read in English, and the study interviewer reported that all could speak English. Most women used a smartphone, attended secondary school or higher, were married, and did not work. Women were not recruited on the basis of depression symptoms, and only 1 had a PHQ9 score greater than or equal to 15 at enrollment [@green:2018b]. The average PHQ9 score upon study entry was `r printnum(phq9M, digits=1)` (possible 27), and the average mood rating was `r printnum(stepM, digits=1)` (possible 9).
+
+```{r characteristics, results='asis'}
+  adminEnroll %>%
+    left_join(screenPre, by="id") %>%
+    dplyr::select(b_age, b_engReadSelfRate, b_highedEduAttended,
+                  b_phoneType, b_workOutsideHome, b_depChildren,
+                  b_marital, b_phqTotal, b_phqPossDep, b_mood,
+                  b_ssMaternity) %>%
+      group_by("Maternity status" = b_ssMaternity) %>%
+      mutate(b_mood = b_mood-1) %>% # shift mood down to 0-9 from 1-10
+      furniture::table1(
+        "Mean age (SD)" = b_age, 
+        "Self-reported English language reading skills" = b_engReadSelfRate,
+        "Highest level of school attended" = b_highedEduAttended,
+        "Phone type" = b_phoneType,
+        "Works outside of the home" = b_workOutsideHome,
+        "Number of dependent children" = b_depChildren,
+        "Marital status" = b_marital,
+        "PHQ-9 Total Score (0-27)" = b_phqTotal,
+        "Possible depression (PHQ9>=15)" = b_phqPossDep,
+        "Mood at enrollment (0-9)" = b_mood,
+        output = "latex2",
+        total = TRUE,
+        type = "condense", 
+        caption = "Characteristics of participants.",
+        label = "tab:characteristics",
+        rounding_perc = 0,
+        na.rm=FALSE)
+```
+
+We conducted interviews with 15 of the `r nrow(adminEnroll)` women who enrolled in the study. They ranged in age from 20 to 38 years. Most were married and had delivered their baby within the past 6 months. All of the interviewees attended some secondary schooling, and 2 had earned a bachelor's degree.
+
+### Data Collection
+
+```{r moodData}
+# shift mood down to 0-9 from 1-10
+  mood <- 
+  mood %>% 
+    mutate(currentMood = currentMood-1) 
+
+# summary number mood ratings per woman (ALL)
+  moodRatings_summary <- 
+  mood %>% 
+    group_by(id) %>%
+    count() %>%
+    ungroup() %>%
+    summarize(mean = mean(n),
+              sd = sd(n))
+
+# at least 3 mood ratings (ALL)
+  mood3 <- 
+  mood %>%
+    group_by(id) %>%
+    count() %>%
+    filter(n>=3) %>%
+    ungroup() %>%
+    mutate(id2 = paste("Participant", id, sep=" "))
+  
+  mood3P <- (nrow(mood3)/nrow(adminEnroll))*100
+
+# summary current mood among at least 3 (ALL)
+  mood_summary <- 
+    mood %>%
+    filter(mood$id %in% mood3$id) %>%
+    group_by(id) %>%
+    summarize(individualMeans = mean(currentMood, na.rm = TRUE)) %>%
+    ungroup() %>%
+    summarize(mean = mean(individualMeans, na.rm = TRUE),
+              sd = sd(individualMeans, na.rm=TRUE))
+```
+
+#### Mood Ratings
+
+Overall, enrolled women submitted `r nrow(mood)` daily mood ratings over the course of the study. The average woman submitted `r printnum(moodRatings_summary$mean, digits=1)` ratings (SD=`r printnum(moodRatings_summary$sd, digits=1)`), and `r printnum(mood3P, digits=1)`% of women submitted at least three ratings. Among those who submitted at least three ratings, the grand mean mood rating was `r printnum(mood_summary$mean, digits=1)` out of 9 (SD=`r printnum(mood_summary$sd, digits=1)`). Figure \@ref(fig:mood) suggests that most women reported a high degree of variability in ratings from one day to the next.
+
+```{r mood, fig.cap=paste0("Time series of ", nrow(mood %>% filter(id %in% mood3$id)), " mood ratings among ", nrow(mood3), " participants who submitted at least three ratings.")}
+  mood %>%
+    filter(id %in% mood3$id) %>%
+    left_join(dplyr::select(mood3, id, id2), by = "id") %>%
+    ggplot(., aes(x=obsDay, y=currentMood)) +
+      geom_line(color=hm_colors["teal"]) +
+      facet_wrap(~ id2) +
+      theme_minimal() +
+      scale_y_continuous(breaks = c(0, 3, 6, 9)) +
+      expand_limits(y = 0) +
+      ylab("Mood rating") +
+      xlab("Study days") 
+```
+
+#### PHQ-9
+
+We did not attempt to administer the PHQ-9 on a regular, ongoing basis to avoid frustrating users and distracting from potential engagement with the intervention. Instead, we only requested that women complete the PHQ-9 again at the end of the study period; `r nrow(screenPost)` women (`r printnum((nrow(screenPost)/nrow(adminEnroll)*100), digits=1)`%) responded.
+
+## Intervention Feasibility and Acceptability
+
+### Engagement Patterns
+
+```{r}
+# count incoming messages
+  incomingMsg <- 
+  transcripts %>%
+    filter(Composer == "Patient") %>%
+    group_by(id) %>%
+    count(name="incomingMsg")
+  
+# count engagement days
+  engageDays <-
+  transcripts %>%
+    filter(Composer == "Patient") %>%
+    group_by(id, obsDay) %>%
+    count() %>%
+    group_by(id) %>%
+    count(name="engageDays")
+  
+# limit transcript to post-registration messages
+  transcripts_postReg <-
+  transcripts %>%
+    filter(postReg==1)
+  
+# count incoming messages post registration
+  incomingMsg_postReg <- 
+  transcripts_postReg %>%
+    filter(Composer == "Patient") %>%
+    group_by(id) %>%
+    count(name="incomingMsg_postReg")
+  
+# count incoming messages post registration in tess mode
+  incomingMsg_postReg_tess <- 
+  transcripts_postReg %>%
+    filter(Composer == "Patient") %>%
+    filter(type=="tess") %>%
+    group_by(id) %>%
+    count(name="incomingMsg_postReg_tess") %>%
+    mutate(incomingMsg_postReg_tess = ifelse(is.na(incomingMsg_postReg_tess), 
+                                             0, 
+                                             incomingMsg_postReg_tess))
+  
+  incomingMsg_postReg <- 
+  incomingMsg_postReg %>%
+    left_join(dplyr::select(incomingMsg_postReg_tess, 
+                            incomingMsg_postReg_tess, id), 
+              by="id") %>%
+    mutate(incomingMsg_postReg_tessP = (incomingMsg_postReg_tess/incomingMsg_postReg)*100)
+  
+# count engagement days post registration
+  engageDays_postReg <-
+  transcripts_postReg %>%
+    filter(Composer == "Patient") %>%
+    group_by(id, obsDay) %>%
+    count() %>%
+    group_by(id) %>%
+    count(name="engageDays_postReg")
+  
+# count sessions started
+  sessionsStarted <- 
+  transcripts %>%
+    filter(!is.na(session)) %>%
+    filter(type=="zuri") %>%
+    filter(Composer=="Patient") %>%
+    distinct(id, session, .keep_all = TRUE) %>%
+    group_by(id) %>%
+    count(name="sessionsStarted")
+
+# count sessions completed
+  sessionsCompleted <- 
+  transcripts %>%
+    filter(!is.na(session)) %>%
+    filter(type=="zuri") %>%
+    filter(Composer=="Patient") %>%
+    group_by(id, session) %>%
+    count(name="messageSession") %>%
+    filter(messageSession>=20) %>%
+    group_by(id) %>%
+    count(name="sessionsCompleted") 
+  
+# combine
+  engagement <- 
+  engageDays %>%
+    left_join(engageDays_postReg, by="id") %>%
+  # add sessions started and completed
+    left_join(sessionsStarted, by="id") %>%
+    left_join(sessionsCompleted, by="id") %>%
+  # add women who did not engage
+    full_join(dplyr::select(adminEnroll, id), by="id") %>%
+  # add incomingMsg count
+    left_join(incomingMsg, by="id") %>%
+    left_join(incomingMsg_postReg, by="id") %>%
+    ungroup() %>%
+  # set non-engaging women to 0
+    mutate(incomingMsg = ifelse(is.na(incomingMsg), 0, incomingMsg),
+           incomingMsg_postReg = ifelse(is.na(incomingMsg_postReg), 
+                                        0, incomingMsg_postReg),
+           incomingMsg_postReg_tess = ifelse(is.na(incomingMsg_postReg_tess), 
+                                             0, incomingMsg_postReg_tess),
+           incomingMsg_postReg_hm = incomingMsg_postReg-incomingMsg_postReg_tess,
+           engageDays = ifelse(is.na(engageDays), 0, engageDays),
+           engageDays_postReg = ifelse(is.na(engageDays_postReg), 
+                                       0, engageDays_postReg),
+           sessionsStarted = ifelse(is.na(sessionsStarted), 0, 
+                                          sessionsStarted),
+           sessionsCompleted = ifelse(is.na(sessionsCompleted), 0, 
+                                            sessionsCompleted)
+           ) %>%
+  # create indicator for any engagement
+    mutate(anyEngagement = factor(ifelse(engageDays > 0, "yes", "no")),
+           anyEngagement_postReg = factor(ifelse(engageDays_postReg > 0, 
+                                                 "yes", "no")))
+  
+anyEngageN <- 
+  engagement %>% 
+  filter(anyEngagement=="yes") %>% 
+  nrow()
+
+anyEngageN_postReg <- 
+  engagement %>% 
+  filter(anyEngagement_postReg=="yes") %>% 
+  nrow()
+
+anyEngageP <- (anyEngageN/nrow(adminEnroll)*100)
+anyEngageP_postReg <- (anyEngageN_postReg/nrow(adminEnroll)*100)
+
+engageDays_summary <- 
+  engagement %>% 
+  filter(anyEngagement=="yes") %>%
+  summarize(mean = mean(engageDays),
+            sd = sd(engageDays))
+
+engageDays_postReg_summary <- 
+  engagement %>% 
+  filter(anyEngagement_postReg=="yes") %>%
+  summarize(mean = mean(engageDays_postReg),
+            sd = sd(engageDays_postReg))
+
+incomingMsg_summary <- 
+  engagement %>% 
+  filter(anyEngagement=="yes") %>%
+  summarize(mean = mean(incomingMsg),
+            sd = sd(incomingMsg))
+
+incomingMsg_postReg_summary <- 
+  engagement %>% 
+  filter(anyEngagement_postReg=="yes") %>%
+  summarize(mean = mean(incomingMsg_postReg),
+            sd = sd(incomingMsg_postReg))
+```
+
+Over the course of the study, `r anyEngageN` women (`r printnum(anyEngageP, digits=1)`%) sent a message to Zuri, and `r anyEngageN_postReg` women engaged beyond registration (`r printnum(anyEngageP_postReg, digits=1)`%). Among this post-registration engagement subset, the average woman engaged with Zuri on `r printnum(engageDays_postReg_summary$mean, digits=1)` days (SD=`r printnum(engageDays_postReg_summary$sd, digits=1)`) and sent `r printnum(incomingMsg_postReg_summary$mean, digits=1)` messages (SD=`r printnum(incomingMsg_postReg_summary$sd, digits=1)`).  On average, women sent `r printnum(mean(incomingMsg_postReg$incomingMsg_postReg_tessP, na.rm=TRUE), digits=1)`% of these messages to Zuri in free chat mode, not as part of a *Healthy Moms* session. The median conversation unfolded over `r printnum(median(convo_duration$duration_hr), digits=1)` hours (range `r printnum(min(convo_duration$duration_hr), digits=1)` to `r printnum(max(convo_duration$duration_hr), digits=1)` hours). Figure \@ref(fig:engage) displays the distributions of these engagement metrics. 
+
+```{r engage, fig.cap=paste0("Distribution of number of days engaged and number of incoming messages sent among ", nrow(engagement %>% filter(anyEngagement_postReg=="yes")) , " women who engaged with Zuri beyond registration.")}
+  p1 <- 
+  engagement %>%
+    filter(anyEngagement_postReg=="yes") %>% 
+    mutate(x=factor(1)) %>%
+    ggplot(., aes(y=engageDays_postReg, x=x)) +
+      geom_violin(fill=hm_colors["lightgrey"], scale = "count", adjust = .5) +
+      theme_minimal() + geom_boxplot(width=0.1) + 
+    geom_jitter(height = 0, width = 0.05) +
+    ylab("Number of days engaged") +
+    ylim(0,NA) +
+    ggtitle("Days engaged") +
+    theme(axis.title.x = element_blank(),
+          axis.text.x = element_blank(),
+          axis.title.y = element_blank())
+  
+  p2 <- 
+  engagement %>%
+    filter(anyEngagement_postReg=="yes") %>%
+    pivot_longer(cols=c("incomingMsg_postReg_tess", "incomingMsg_postReg_hm"),
+                 names_to = "type",
+                 values_to = "number",
+                 names_prefix = "incomingMsg_postReg_") %>%
+    dplyr::select(id, number, type) %>%
+    mutate(type = factor(type, 
+                         levels=c("hm", "tess"),
+                         labels=c("Healthy Moms Session",
+                                  "Free chat"))) %>%
+    ggplot(., aes(y=number, x=type, fill=type)) +
+      geom_violin(scale = "count", adjust = .5) +
+      scale_fill_manual(values=c("#ee7067", "#81cbce")) +
+      theme_minimal() + geom_boxplot(width=0.1, fill="white") + 
+    geom_jitter(height = 0, width = 0.05) +
+    ylab("Incoming messages") +
+    #xlab("Type") +
+    ylim(0,NA) +
+    ggtitle("Incoming messages") +
+    theme(axis.title.x = element_blank(),
+          #axis.text.x = element_blank(),
+          axis.title.y = element_blank(),
+          legend.position = "none")
+  
+  grid.arrange(p1, p2, ncol=2)
+```
+
+To further investigate the nature of participant-initiated chats, we analyzed conversation transcripts and summarized the conversation modules engaged. Figure \@ref(fig:modules) shows the distribution of incoming messages by free chat conversation module and maternity status. MORE HERE.
+
+```{r modules, fig.cap="Distribution of incoming messages by free chat conversation module and maternity status."}
+  transcripts %>%
+    left_join(screenPre, by="id") %>%
+    filter(Composer=="Patient") %>%
+    filter(type=="tess") %>%
+    mutate(State = gsub('[0-9]+', '', State)) %>%
+    mutate(State = sub("_$", "", State)) %>%
+    filter(State!="") %>%
+    mutate(State = ifelse(grepl("SYS|sys|Sys|ANYELSE|BYE|CONFIRM_BYE|NAME", 
+                                State), 
+                          "System", State)) %>%
+    mutate(State = ifelse(grepl("ELABORATE|EVAL|EVALJTAI|FEED", 
+                                State), 
+                          "System", State)) %>%
+    mutate(State = ifelse(grepl("EA_GEN|EA", 
+                                State), 
+                          "System", State)) %>%
+    filter(State!="System") %>%
+    left_join(modules, by="State") %>%
+    dplyr::select(-State) %>%
+    rename(State = module3) %>%
+    mutate(State = factor(State),
+           b_ssMaternity = factor(b_ssMaternity)) %>%
+    group_by(b_ssMaternity, State, .drop = FALSE) %>%
+    count() %>%
+    group_by(b_ssMaternity) %>%
+    mutate(p = (n/sum(n))*100) %>%
+    ungroup() %>%
+    dplyr::select(-n) %>%
+    {. ->> long_} %>%
+    spread(b_ssMaternity, p, fill = 0) %>%
+    mutate(State = reorder(State, Pregnant)) %>%
+    {. ->> wide_}
+
+  long_ <- 
+    long_ %>%
+    mutate(State = factor(State, levels=levels(wide_$State)))
+  
+    ggplot(wide_, aes(y = State)) +
+      geom_point(data = long_, aes(x = p, color = b_ssMaternity)) +
+      geom_dumbbell(aes(x = Pregnant, xend = Postpartum),
+                    size=2.5, 
+                    color="#e3e2e1", 
+                    colour_x = "#ee7067", 
+                    colour_xend = "#b62943",
+                    dot_guide=TRUE, 
+                    dot_guide_size=0.2) + 
+      theme_minimal() +
+      scale_color_manual(name = "", values = c("#b62943", "#ee7067")) +
+      theme(axis.text.x = element_text(angle = 0, hjust = 1),
+            panel.grid.major.y = element_blank(),
+            panel.grid.minor = element_blank(),
+            legend.position = "top") +
+      ylab("Free chat modules") +
+      xlab("Percent") 
+```
+
+The average woman who engaged with Zuri post-registration started and completed `r printnum(mean(sessionsStarted$sessionsStarted), digits=1)` (SD=`r printnum(sd(sessionsStarted$sessionsStarted), digits=1)`) and `r printnum(mean(sessionsCompleted$sessionsCompleted), digits=1)` (SD=`r printnum(sd(sessionsCompleted$sessionsCompleted), digits=1)`) *Healthy Moms* sessions, respectively. The median time from a "push" session invite to a woman responding was `r printnum(median(inviteToStart$delay_hr), digits=1)` hours (range `r printnum(min(inviteToStart$delay_hr), digits=1)` to `r printnum(max(inviteToStart$delay_hr), digits=1)` hours). Figure \@ref(fig:waffle) shows one woman's engagement pattern over the course of the study period. There were no reported adverse events.
+
+```{r waffle, fig.width=10, fig.height=3, fig.cap="Engagement pattern for Participant 3. Dates shifted to maintain anonymity but pattern preserved."}
+# https://vuorre.netlify.com/post/2016/03/24/github-style-waffle-plots-in-r/
+  gh_waffle <- function(data, pal = "D", dir = -1){
+    
+    p <- ggplot(data, aes(x = week, y = day, fill = factor(type))) +
+      scale_fill_manual(values = c("grey93", "#b62943", "#ee7067"),
+                        #breaks = c(0, 1, 2),
+                        breaks = c("none", "zuri", "tess"),
+                        name = "Engagement",
+                        labels = c("None", "Healthy Moms Session", "User-initiated chat")) +
+      geom_tile(color = "white", size = 0.6) +
+      facet_wrap("year", ncol = 1) +
+      scale_x_continuous(
+        expand = c(0, 0),
+        breaks = seq(1, 52, length = 12),
+        labels = c("Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                   "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")) +
+      theme_tufte(base_family = "Helvetica") +
+      theme(axis.title = element_blank(),
+            axis.ticks = element_blank(),
+            legend.position = "bottom",
+            strip.text = element_text(hjust = 0.01, face = "bold", size = 15),
+            plot.title=element_text(face="bold", size=20),
+            plot.subtitle=element_text(face="bold", size=15),
+            axis.text=element_text(size=12),
+            legend.title=element_text(size=15),
+            legend.text=element_text(size=12)
+            ) + 
+      geom_text(aes(label=session), color = "white", family="Helvetica") +
+      labs(title = "Pattern of engagement, Participant 3")
+    
+    print(p)
+  }
+
+ 
+  transcripts_postReg %>% 
+  filter(Composer=="Patient") %>% 
+  filter(id==39) %>% 
+  mutate(engDate = ymd("2019-03-09")+days(obsDay)) %>% # arbitrary dates
+  distinct(id, engDate, .keep_all=TRUE) %>% 
+  complete(engDate = seq.Date(ymd("2019-01-01"), ymd("2019-12-31"), by="day")) %>% 
+  fill(id) %>% 
+  mutate(type = if_else(is.na(type), "none", type)) %>% 
+  mutate(dir_in = 1) %>% 
+  mutate(week = as.integer(format(engDate, "%W")) + 1) %>% # Week starts at 1)
+  mutate(day = factor(weekdays(engDate, T), 
+                        levels = rev(c("Mon", "Tue", "Wed", "Thu",
+                                       "Fri", "Sat", "Sun")))) %>%
+  arrange(engDate) %>% 
+  mutate(year = format(engDate, "%Y")) %>%
+  gh_waffle()
+```
+
+### Correlates of Engagement
+
+```{r predictors, results='hide', cache=TRUE}
+  engagement_ <- 
+  screenPre %>%
+    left_join(engagement, by="id") %>%
+  # transform predictors
+    mutate(higherEdu = ifelse(b_highedEduAttended=="College" |
+                              b_highedEduAttended=="University", 
+                              1, 0),
+           excellentEng = ifelse(b_engReadSelfRate=="Excellent",
+                                 1, 0),
+           smartphone = ifelse(b_phoneType=="Smartphone", 1, 0),
+           married = ifelse(b_marital=="No, not in a union", 0, 1),
+           employed = ifelse(b_workOutsideHome=="Yes", 1, 0),
+           age = rescale(b_age),
+           pregnant = ifelse(b_ssMaternity=="Pregnant", 1, 0),
+           phq = rescale(b_phqTotal)
+           ) %>%
+    dplyr::select(incomingMsg_postReg,
+                  higherEdu, excellentEng,
+                  smartphone, married, 
+                  employed, 
+                  age, pregnant, phq) %>%
+    filter(complete.cases(.))
+  
+  fit.b <- brm(incomingMsg_postReg ~ .,
+                  data = engagement_,
+                  seed=325)
+  
+  fit.b.p <- 
+    as_tibble(as.matrix(fit.b)) %>%
+    rename(`higher education: yes` = b_higherEdu) %>%
+    rename(`excellent language skills: yes` = b_excellentEng) %>%
+    rename(`smartphone: yes` = b_smartphone) %>%
+    rename(`married: yes` = b_married) %>%
+    rename(`employed: yes` = b_employed) %>%
+    rename(`age (centered/2sd)` = b_age) %>%
+    rename(`pregnant: yes` = b_pregnant) %>%
+    rename(`PHQ-9 score (centered/2sd)` = b_phq)
+```
+
+To examine the relationship between participant characteristics measured at baseline and intervention engagement, we estimated a Bayesian linear regression model of incoming messages. Figure \@ref(fig:predictorsPlot) displays the Markov chain Monte Carlo draws from the posterior distribution of the parameters. There is some evidence to suggest that being pregnant (vs a new mom), reporting greater depression symptom severity, and being employed outside of the home is associated with less engagement, whereas being married and more educated is associated with more engagement. For instance, the point estimate is that married women sent `r printnum(abs(fixed.effects(fit.b)["married", "Estimate"]), digits=1)` more messages, holding all else constant. And for every two standard deviation increase in the baseline PHQ-9 score, holding all else constant, the point estimate is that women sent `r printnum(abs(fixed.effects(fit.b)["phq", "Estimate"]), digits=1)` fewer messages. These are small effects in absolute terms but interesting to consider for future iterations of Zuri that focus on how to increase engagement overall and for different user personas.
+
+```{r predictorsPlot, results='hide', fig.cap=paste0("Results of a Bayesian linear regression model of incoming messages on participant characteristics measured at baseline (N=", nrow(fit.b$data), "). Plot shows Markov chain Monte Carlo draws from the posterior distribution of the parameters.")}
+
+  color_scheme_set("teal")
+  bayesplot_theme_set(theme_minimal())
+  fit.b.p %>%
+    dplyr::select(-`b_Intercept`, -sigma, -lp__) %>%
+    mcmc_areas_ridges(prob = 0.8) +
+    #mcmc_areas(prob = 0.8, point_est = "median") +
+    #xlab("Dependent variable: Incoming messages") +
+    ggtitle("Posterior distributions of model parameters, 80% intervals",
+            subtitle="Dependent variable: Number of incoming messages")
+```
+
+### Qualitative Findings
+
+Most of the women interviewed who had tried Zuri had a very positive attitude towards the service and expressed that they could trust Zuri. One woman said, "It's like a mom to me. My mom is very far, and my sister doesn't have any knowledge of kids." Another woman said, "I usually keep it to myself. So, when I am chatting with Zuri, it's like they have the right questions to ask me, and they teach me how to relate with my child, relate with other people." Some of the women had also shared Zuri with others, such as their partners or their neighbors. Most of the time, they received positive feedback from them. One woman said, "My husband was very supportive, because sometimes he used to help me with some answers." Many women said that they preferred to chat with Zuri than to chat with a counselor, because they felt they could be more open. For instance, one woman said, "I prefer Zuri because they don't know me." 
+
+Nonetheless, women noticed that Zuri was not perfect and described examples of when Zuri gave an irrelevant response when they asked her a question. Most said they would just ignore the messages and moved on. In our review of chat transcripts, we learned that Zuri was easily confused by messages coming out of order over SMS. This was not an issue on Facebook Messenger, but almost every woman said they preferred to chat with Zuri through SMS. The main reason being that SMS was free, whereas chatting through Facebook Messenger required them to buy data bundles to access to the Internet.  
+
+Many women mentioned that their favorite part of *Healthy Moms* was the exercises taught by Zuri and the journal, including meditation, breathing, and walking. They found those exercises were easy and could help them relax. One woman said, "They made me be flexible...until my delivery day." Other women said that they really appreciated the advice given by Zuri. They indicated that it was hard to seek for professional advice because many people gave advice based on their experience. They felt like they could trust Zuri because she was more unbiased. They especially liked the advice regarding breastfeeding and how to play with the child. As one woman indicated, "For the baby, I never knew she's supposed to be massaged after the bath at all. I never knew she can see different colors."
+
+Women gave three main reasons why they registered with Zuri and continued to engage. The first reason was the anxiety and stress of pregnancy. They were either ashamed of their bodies or worried about experiencing a miscarriage. One woman said, "One of the negative thoughts I had was maybe if I don't want food what will happen. And then if I sleep bad what will happen to my baby...Actually I was getting worried if I don't feel the movement of my baby inside me sometimes." The second reason was that many postpartum women did not feel confident in their roles as new mothers. One woman expressed her anxiety by saying, "It's like I don't know how to take care of her, good care of her." The final reason was that many of the women interviewed did not have a stable source of income, which caused them stress.
+
+Women described four main barriers to engaging with Zuri. The first was connectivity. Some women either damaged or lost their phones and did not know how to reconnect with Zuri. The second challenge was that women were easily (and understandably) distracted by their new baby and forgot to complete open sessions. As one woman said, "The text can come in the morning no matter if I am busy or if I am free to answer. If I am free, I just sit and relax. But you see, sometimes we are texting, and the baby starts crying." The third challenge was that the registration process was very confusing for some women, especially early on in the study, so some women stopped participating. Related to this, some women were confused by our study's use of 2 SMS short codes: 1 for Zuri and 1 for study assessments. Despite these challenges, women did not contact our study coordinator to receive assistance using Zuri.
+
+## Preliminary Evidence on Response to Treatment
+
+```{r}
+# merge tx start date/time with outcome data
+  mood_ <-
+  mood %>%
+    group_by(id) %>%
+    arrange(id, obsDay) %>%
+    mutate(obs = seq(from=0, to=n()-1)) %>% 
+    ungroup() %>%
+    filter(!is.na(currentMood)) %>%
+    filter(!is.na(period))
+  
+# find center value for post (last)
+  center_trt <-
+  mood_ %>%
+    filter(treatment==1) %>%
+    group_by(id) %>%
+    filter(row_number()==n()) %>%
+    mutate(lastObsT = obs) %>%
+    dplyr::select(id, lastObsT)
+  
+# merge center values back to outcomes
+  mood_df <-
+  mood_ %>%
+    left_join(center_trt, by="id") %>%
+    mutate(twb = ifelse(period=="b", obs, 0),
+           twt = ifelse(treatment==1, obs-lastObsT, 0)
+           ) %>%
+    mutate(twb3 = ifelse(period=="b" & (obs>=0 & obs<=2), 0, 
+                  ifelse(period!="b", 0, obs-2))) %>%
+    mutate(twt3 = ifelse(treatment==1 & (obs<=lastObsT-3), 
+                         obs-lastObsT+2, 0)) 
+  
+# identify women with least 4 mood ratings per period
+  mood_minPerPeriod <- 
+  mood_df %>% 
+    group_by(id, treatment) %>%
+    count() %>%
+    filter(n>=4) %>%     # at least 4
+    group_by(id) %>%
+    count() %>%
+    filter(n==2)         # appears in b and t
+
+# limit outcome data to women with min number of ratings per period
+  mood_df_min <- 
+  mood_df %>% 
+    filter(id %in% mood_minPerPeriod$id) 
+```
+
+In preparation for modeling the response to treatment, we subset the data to the `r nrow(mood_minPerPeriod)` women who contributed at least 4 mood ratings before and after starting the intervention. Figure \@ref(fig:moodByPeriod) plots the time series of ratings by period and overlays days of intervention engagement with vertical lines.
+
+```{r moodByPeriod, fig.cap=paste0("Time series of ", nrow(mood_df_min), " mood ratings by participant (N=", length(unique(mood_df_min$id)), ") and period. Days engaged with Zuri indicated by vertical lines.")}
+# get all engagement dates among min group
+  engagementDates <- 
+  transcripts_postReg %>%
+    filter(id %in% mood_df_min$id) %>%
+    filter(Composer == "Patient") %>%
+    group_by(id, obsDay) %>%
+    count() 
+
+# plot engagement by period among min group
+  mood_df_min %>%
+    mutate(period = factor(period, 
+                           levels=c("b", "t"),
+                           labels=c("baseline", "treatment"))) %>%
+  ggplot(., aes(x = obsDay, y = currentMood)) +
+    geom_line() +
+    theme_classic() +
+    facet_grid(id ~ period) + #, scales = "free") +
+    ylim(0,9) +
+    scale_y_continuous(breaks=c(0, 9)) +
+    geom_hline(aes(yintercept = 4.5), linetype="dotted", colour = "grey") +
+    labs(x = "Study days",
+         y = "Mood Rating"
+         ) +
+    geom_vline(data=engagementDates, aes(xintercept=obsDay, 
+                                           color=hm_colors["salmon"]),
+                 alpha=0.2) +
+    theme(legend.position = "none")
+    
+```
+
+```{r, results='hide', cache=TRUE}
+  m3.b <- brm(currentMood ~ treatment + twb3 + twt3 + (1|id),
+              autocor = cor_ar(form = ~obs|id, p = 1),
+              data = mood_df_min,
+              seed = 234)
+  
+  m3.b.p <- 
+    as_tibble(as.matrix(m3.b))
+  
+  m3.b.h <- hypothesis(m3.b, "treatment > 0")
+  
+# effect size
+# http://jakewestfall.org/blog/index.php/2016/03/25/five-different-cohens-d-statistics-for-within-subject-designs/
+  (means <- with(mood_df_min, tapply(currentMood, treatment, mean)))
+  md <- diff(means)
+  (d <- md / with(mood_df_min, sqrt(mean(tapply(currentMood, treatment, var)))))
+```
+
+Figure \@ref(fig:moodmodel) presents the estimates from a Bayesian linear mixed-effects model. The model included a random effect for observations nested within participants and the following fixed effects: (1) an intercept; (2) a dummy indicator for the treatment phase; (3) a time-within-baseline variable; and (4) a time-within-treatment variable. The time-within-period variables were centered around the first 3 or last 3 observations of the period (first for baseline, last for treatment).
+
+The intercept represents the mean value of the outcome at the first 3 baseline assessments, the treatment indicator is a contrast between the first 3 baseline assessments and last 3 observations in the treatment period, and the time-within-period variables estimate linear change during the baseline and treatment periods.
+
+In this model, the average mood rating at the start of the baseline period was `r printnum(fixed.effects(m3.b)["Intercept", "Estimate"], digits=2)` on a scale of 0 to 9, and there was no significant baseline trend (an assumption for inference using the multiple baseline design). The point estimate of the treatment effect was `r printnum(fixed.effects(m3.b)["treatment", "Estimate"], digits=2)`, which represents a `r printnum((fixed.effects(m3.b)["treatment", "Estimate"]/fixed.effects(m3.b)["Intercept", "Estimate"])*100, digits=1)`% increase in mood over the baseline mean (d=`r printnum(d, digits=2)`). The posterior probability that this effect is greater than zero is `r printnum(as.numeric(m3.b.h$hypothesis["Post.Prob"]*100), digits=1)`%.
+
+We could not run the same analysis using PHQ-9 scores because we only attempted to collect data at 2 time points and only obtained complete data for `r printnum((nrow(screenPost)/nrow(adminEnroll))*100, digits=2)`% of the (small) sample.
+
+```{r moodmodel, fig.cap=paste0("Estimates from a Bayesian linear mixed-effects model of repeated measures data on self-reported mood throughout the study period (", nrow(m3.b$data), " observations among ", length(unique(m3.b$data$id)), " participants). Uncertainty intervals computed from posterior Markov chain Monte Carlo draws.")}
+  
+  color_scheme_set("teal")
+  bayesplot_theme_set(theme_minimal())
+  m3.b.p %>%
+    dplyr::select(b_Intercept, b_treatment, b_twb3, b_twt3) %>%
+    rename(intercept = b_Intercept) %>%
+    rename(`time-within-baseline` = b_twb3) %>%
+    rename(treatment = b_treatment) %>%
+    rename(`time-within-treatment` = b_twt3) %>%
+    mcmc_areas(prob = 0.8, prob_outer = 0.95, point_est = "median",
+               area_method = "scaled height") +
+    ggtitle("Estimates of model parameters, 80%/95% intervals",
+            subtitle="Dependent variable: Current mood (0-9)")
+```
+
+### Qualitative Findings
+
+Many women attributed positive impacts to the intervention, which we grouped into three themes. The first theme was that Zuri helped them to take care of themselves. Women said that they loved themselves more, their mood had improved, and that they had learned how to replace negative thoughts with positive thoughts. One woman described her experience with Zuri by saying, "Because a pregnant woman is...tired all the time, right? But with Zuri everything was good. I was very active because it also made me have lessons. Because I knew after waking up in the morning I will breathe in and out some minutes. After that I brush, take my breakfast, I wait for noon time something like 12:00 or even 1:00. I go for a walk. After walking I come back shower then I keep myself busy with Zuri. So it's very helpful actually." One woman who was ashamed of her body during pregnancy said, "I started kind of thinking better, that when you are pregnant, the shape changes and after delivery and doing exercises, everything goes back to normal."
+
+The second theme was that women could better care for their babies. Many women indicated that they could relate to their child better and experienced less distress raising the child. As one woman said, "All those exercises, how to relate to the child, what you do to the child...Honestly, if I hadn't talked to Zuri, I wouldn't know. Yeah, I wouldn't know." One woman who feared miscarriage even attributed her baby's health and her uncomplicated delivery to Zuri, which we interpret as the woman having found comfort in Zuri during a stressful period.
+
+The last theme was that women experienced improved relationships with others. Some women reported socializing more with others, and this expanding social support system further improved their mood. As one woman said, "I used to have the habit of staying alone, not socializing with other people. Zuri made me be able to socialize with people. When they see me doing the exercises, they like knowing where I learnt them from." Some women felt more secure and could trust others more. One woman said that she was anxious about leaving her child with another person, even with her family members. However, after finishing a session with Zuri on seeking social support, she explained that she was willing to try asking for help. She reported, "So I have tried. [The baby] was comfortable. She cried for some time, then she got used to it."
+
+# Discussion
+
+In this pre-pilot study we recruited pregnant women and new mothers in Kenya to try an experimental psychological support service called Zuri. Zuri is a chatbot that engages users in automated, text-based conversations over SMS and Facebook Messenger. Users could initiate chats with Zuri or complete sessions from the *Healthy Moms* perinatal depression intervention curriculum, a cognitive behavioral therapy-based intervention we adapted from the *Thinking Healthy Program* [@worldhealthorganization:2015]. We used a single-case experimental design with repeated-measures data collection and in-depth interviews to explore the feasibility and acceptability of the service, generate a preliminary estimate of response to treatment, and test study procedures.
+
+Through individual interviews and a review of system logs, we determined that the service was both feasible to deliver and acceptable to this sample of users, but not without significant room for improvement and further refinement. Roughly two-thirds of women in the study tried Zuri at least once, and half of those who tried engaged beyond the registration process. This retention rate of `r printnum((anyEngageN_postReg/anyEngageN)*100, digits=1)`% is slightly above an average 30-day retention rate of 43% across industries [@perro:2018] and 40% across provider-prescribed mental health apps [@imsinstitute:2015]. Our retention rate is based on a small denominator of `r anyEngageN` women who tried the intervention, of course, but it suggests that engagement with the initial version of the service is within the range of other digital health apps. Clearly, preventing churn is a common challenge.
+
+Users we interviewed pointed to several positive features of Zuri, including feeling connected to 'someone' who cares, but having the benefit of perceived anonymity and privacy of chatting with a machine. This is consistent with existing research showing that people may be more willing to disclose personal information when they believe their responses are not being observed by another person [@lucas:2014], and it probably helps to explain our recruitment experience. Of the women who completed the automated screening, 29% endorsed having recent suicidal ideation, and nearly all of them accepted our referral to in-person services. So despite having recent and regular contact with antenatal or postpartum medical providers, these women were reporting something to Zuri that they presumably had not reported to frontline medical workers—either because they were not asked, chose not to disclose, or both. There is a substantial latent need for mental health treatment that exists alongside the manifest gaps in access that chatbots like Zuri could discover and begin to address.
+
+In addition to reporting largely positive impressions of Zuri, users reported modest improvements in mood. To estimate this improvement, we used a multiple baseline design with repeated measures data collection and fit a multilevel model. Importantly for making a causal inference, we did not observe an increasing trend in mood during the baseline period. We did, however, observe a small effect in the treatment period. With `r nrow(m3.b$data)` mood ratings from `r length(unique(m3.b$data$id))` women before and after beginning the treatment, we estimated that mood improved `r printnum((fixed.effects(m3.b)["treatment", "Estimate"]/fixed.effects(m3.b)["Intercept", "Estimate"])*100, digits=1)`% over the average mood reported at the start of the baseline period (d=`r printnum(d, digits=2)`). We have high confidence that this effect is greater than zero, but we are similarly confident that the effect is small. Quantifying this estimate gives us a benchmark for assessing progress in future iterations of the service that we will test with a clinically-indicated group of users. 
+
+We can also look to the digital health and psychotherapy literature for external benchmarks. While there has been a proliferation of conversational agents for health in recent years [@montenegro:2019], the evidence-base is small [@laranjo:2018]. Two recent randomized controlled trials of CBT-based chatbots stand out. In a study of 75 U.S. college students, Tess, an automated chatbot that provides brief psychological interventions over common communication channels like SMS and Facebook Messenger, reduced depression symptom severity by roughly 20%, a reported standardized effect of 0.68 [@fulmer:2018]. Another chatbot called Woebot, a standalone app that delivers CBT, was tested in a trial with 70 students in the U.S.; Woebot reduced symptoms of depression by 19%, a reported standardized effect of 0.44 [@fitzpatrick:2017]. For reference, a recent meta-analysis reported that standardized effects of traditional in-person psychotherapy for depression range from 0.66 to 0.77 [@cuijpers:2018]. Automated conversational agents like Zuri, Tess, and Woebot have the potential to lower the cost of service delivery while simultaneously expanding our reach, which could make them highly cost-effective. 
+
+Before we can test this hypothesis with Zuri, however, we need to build a more robust intervention. As expected with an alpha version, we observed many opportunities for improvement. Some challenges users reported, like our use of 2 shortcodes and a confusing registration process, will resolve naturally in future tests. The bigger challenge will be making the content more engaging to reduce churn and making the service more robust to misunderstandings. One way to avoid some of the confusion we observed in conversations will be to move away from SMS, which can jumble the message order, and add a new channel through WhatsApp, the most popular messaging app in Africa [@dahir:2018]. 
+
+In terms of study procedures, we observed a response rate of `r printnum((nrow(adminScreen)/nrow(invite))*100, digits=0)`% among a group of women already enrolled in their county's health SMS program. `r printnum(screenPossDep, digits=0)`% of women who completed the screening scored at or above the cutoff for possible depression, and `r printnum((nrow(adminEnroll)/nrow(adminScreen))*100, digits=0)`% of eligible women completed the enrollment process. Depression was not a requirement for inclusion in this study, but it will be in future studies. Our experience in this pre-pilot suggests an overall enrollment rate of `r printnum(((nrow(adminScreen)/nrow(invite)))*(screenPossDep/100)*(nrow(adminEnroll)/nrow(adminScreen))*100, digits=0)`% taking depression symptoms into account. Therefore, to recruit a sample of 100 possibly depressed pregnant women and new mothers in a future trial, these estimates suggest that we would need to advertise to a pool of at least 10,000 women. This would be easily achieved through print and digital advertising. In Nairobi county alone, there were more than 130,000 live births in 2017 [@murphy:2017]. 
+
+Our experience with remote automated data collection suggests that women were willing and able to reply to 1-question prompt asking them to rate their current mood. However, we were less successful at obtaining endline data using the PHQ-9. In a future trial, it will be important to budget and plan for study staff to augment remote data collection procedures.
+
+## Limitations
+
+The objective of this pre-pilot was to adapt *Thinking Healthy* for delivery through Zuri, develop and test study procedures to inform the design of a future trial, and to generate preliminary evidence to guide the next round of Zuri's development. We were limited in our pursuit of these objectives by the fact that we only offered screening and conversations in English. This likely constrained our recruitment efforts as non-English speaking women did not have an opportunity to participate. This implies that our estimates for future recruitment are conservative. The other main limitation of operating Zuri in English is that we do not have data on how Zuri functions in Swahili. This is a priority target for development. A related limitation is that, by virtue of requiring advanced language skills, we recruited a highly educated sample of women relative to the general population. In a future trial it will be important to explore how women of all educational background engage with Zuri.
+
+## Conclusions 
+
+We determined that Zuri is feasible to deliver via SMS and acceptable to a sample of pregnant women and new mothers recruited from two large public hospitals in Kenya. The results of this pre-pilot will serve as a baseline for future studies in terms of recruitment, data collection, and outcomes. The next step in Zuri's development is to refine the intervention content and add Swahili language support. Conversational agents like Zuri have great potential to address the large treatment gap that exists in many low-resource settings, both as a new channel of treatment and as an adjunct to traditional and task-shifting approaches.
+
+\newpage
+
+# References
+
+

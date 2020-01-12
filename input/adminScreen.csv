@@ -1,0 +1,87 @@
+"id","screenResult","followupResult","whyNotEligibleOther","referral"
+1,"eligible","did not enroll",NA,NA
+2,"eligible","enrolled",NA,NA
+3,"not eligible","not eligible",NA,"accepted"
+4,"eligible","enrolled",NA,NA
+5,"not eligible","not eligible",NA,"accepted"
+6,"eligible","enrolled",NA,NA
+7,"not eligible","not eligible",NA,"refused"
+8,"not eligible","not eligible",NA,"refused"
+9,"eligible","enrolled",NA,NA
+10,"eligible","enrolled",NA,NA
+11,"eligible","enrolled",NA,NA
+12,"not eligible","not eligible",NA,"accepted"
+13,"eligible","did not enroll",NA,NA
+14,"not eligible","not eligible",NA,"accepted"
+15,"not eligible","not eligible",NA,"accepted"
+16,"eligible","did not enroll",NA,NA
+17,"eligible","enrolled",NA,NA
+18,"eligible","enrolled",NA,NA
+19,"eligible","enrolled",NA,NA
+20,"not eligible","not eligible",NA,"accepted"
+21,"eligible","enrolled",NA,NA
+22,"eligible","enrolled",NA,NA
+23,"eligible","did not enroll","other",NA
+24,"not eligible","not eligible",NA,"accepted"
+25,"not eligible","not eligible",NA,"accepted"
+26,"not eligible","not eligible",NA,"refused"
+27,"not eligible","not eligible",NA,"accepted"
+28,"eligible","enrolled",NA,NA
+29,"not eligible","not eligible",NA,"accepted"
+30,"eligible","did not enroll",NA,NA
+31,"eligible","enrolled",NA,NA
+32,"eligible","did not enroll",NA,NA
+33,"eligible","enrolled",NA,NA
+34,"eligible","enrolled",NA,NA
+35,"eligible","enrolled",NA,NA
+36,"eligible",NA,NA,NA
+37,"eligible","did not enroll",NA,NA
+38,"eligible","enrolled",NA,NA
+39,"eligible","enrolled",NA,NA
+40,"eligible","enrolled",NA,NA
+41,"eligible","enrolled",NA,NA
+42,"eligible","not eligible",NA,NA
+43,"not eligible","not eligible",NA,"accepted"
+44,"eligible","enrolled",NA,NA
+45,"eligible","enrolled",NA,NA
+46,"eligible",NA,NA,NA
+47,"eligible","enrolled",NA,NA
+48,"eligible","enrolled",NA,NA
+49,"not eligible","not eligible",NA,"accepted"
+50,"eligible","enrolled",NA,NA
+51,"not eligible","not eligible",NA,"accepted"
+52,"not eligible","not eligible",NA,"accepted"
+53,"eligible","enrolled",NA,NA
+54,"not eligible","not eligible",NA,"accepted"
+55,"not eligible","not eligible",NA,"accepted"
+56,"eligible","enrolled",NA,NA
+57,"not eligible","not eligible",NA,"accepted"
+58,"eligible","enrolled",NA,NA
+59,"eligible","enrolled",NA,NA
+60,"eligible","enrolled",NA,NA
+61,"not eligible","not eligible",NA,"accepted"
+62,"eligible","did not enroll",NA,NA
+63,"eligible","enrolled",NA,NA
+64,"eligible","enrolled",NA,NA
+65,"not eligible","not eligible",NA,"accepted"
+66,"eligible","did not enroll",NA,NA
+67,"not eligible","not eligible",NA,"accepted"
+68,"not eligible","not eligible",NA,"accepted"
+69,"eligible","enrolled",NA,NA
+70,"eligible","did not enroll",NA,NA
+71,"eligible","enrolled",NA,NA
+72,"eligible","enrolled",NA,NA
+73,"eligible","not eligible",NA,NA
+74,"eligible","enrolled",NA,NA
+75,"eligible","enrolled",NA,NA
+76,"eligible","not eligible","other",NA
+77,"eligible",NA,NA,NA
+78,"not eligible","not eligible",NA,"accepted"
+79,"not eligible",NA,NA,NA
+80,"eligible",NA,NA,NA
+81,"eligible","enrolled",NA,NA
+82,"eligible","enrolled",NA,NA
+83,"eligible","enrolled",NA,NA
+84,"not eligible","not eligible",NA,"accepted"
+85,"eligible","enrolled",NA,NA
+86,"eligible","did not enroll",NA,NA
